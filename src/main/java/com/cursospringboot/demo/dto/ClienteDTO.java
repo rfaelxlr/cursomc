@@ -8,7 +8,7 @@ import javax.validation.constraints.NotEmpty;
 import org.hibernate.validator.constraints.Length;
 
 import com.cursospringboot.demo.domain.Cliente;
-
+@ClienteUpdate
 public class ClienteDTO  implements Serializable {
 	
 	/**
