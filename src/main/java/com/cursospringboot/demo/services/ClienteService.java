@@ -16,11 +16,14 @@ import org.springframework.stereotype.Service;
 import com.cursospringboot.demo.domain.Cidade;
 import com.cursospringboot.demo.domain.Cliente;
 import com.cursospringboot.demo.domain.Endereco;
+import com.cursospringboot.demo.domain.enums.Perfil;
 import com.cursospringboot.demo.domain.enums.TipoCliente;
 import com.cursospringboot.demo.dto.ClienteDTO;
 import com.cursospringboot.demo.dto.ClienteNewDTO;
 import com.cursospringboot.demo.repositories.ClienteRepository;
 import com.cursospringboot.demo.repositories.EnderecoRepository;
+import com.cursospringboot.demo.security.UserSS;
+import com.cursospringboot.demo.services.exceptions.AuthorizationException;
 import com.cursospringboot.demo.services.exceptions.DataIntegrityException;
 import com.cursospringboot.demo.services.exceptions.ObjectNotFoundException;
 
@@ -37,10 +40,17 @@ public class ClienteService {
 	private EnderecoRepository enderecoRepository;
 	
 	@Autowired
-	BCryptPasswordEncoder pe;
+	BCryptPasswordEncoder pe; 
 	
 	
 	public Cliente find(Integer id) {
+		
+
+		UserSS user = UserService.authenticated();
+		if (user==null || !user.hasRole(Perfil.ADMIN) && !id.equals(user.getId())) {
+			throw new AuthorizationException("Acesso negado");
+		}		
+		
 		Optional<Cliente> obj = repo.findById(id);
 		
 		return obj.orElseThrow(() -> new ObjectNotFoundException(
